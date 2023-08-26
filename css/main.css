@@ -1,0 +1,45 @@
+html {
+    height: 100%;
+}
+
+body {
+    height: 100%;
+    margin: 0;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: black;
+}
+
+#tray {
+    background: lightgreen;
+    display: flex;
+    justify-content: space-around;
+    padding: 5px;
+}
+
+#board {
+    background: white;
+    display: flex;
+    flex-grow: 1;
+    justify-content: space-around;
+    padding: 10px;
+}
+
+.slot {
+    min-width: 25%;
+    background: lightcyan;
+    border-radius: 10px;
+}
+
+.card {
+    background: lightcoral;
+    min-height: 100px;
+    max-height: 25vh;
+    min-width: 70px;
+    max-width: 0.12vw;
+    border: solid darkslategray;
+}

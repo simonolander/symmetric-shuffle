@@ -1,17 +1,350 @@
-<!doctype html>
-<html class="no-js" lang="">
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>S3</title>
-  <meta name="description" content="">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Game Title</title>
+  <style>
+      body {
+          margin: 0;
+          padding: 0;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          height: 100vh;
+          background-color: #f0f0f0;
+      }
 
-  <link rel="stylesheet" href="css/main.css">
+      #game-container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          background-color: #fff;
+          max-width: 100%;
+          max-height: 100%;
+          height: 400px;
+      }
+
+      #card-area {
+          display: flex;
+          align-items: center;
+          justify-content: space-around;
+          flex-grow: 1;
+      }
+
+      #center-cards {
+          display: flex;
+          align-items: center;
+          justify-content: space-around;
+          flex-grow: 1;
+      }
+
+      .dots {
+          width: 25px;
+          height: 150px;
+          margin: 5px;
+      }
+
+      .card {
+          width: 100px;
+          height: 150px;
+          margin: 5px;
+          cursor: pointer;
+          border: 1px solid #aaa;
+          border-radius: 10px;
+      }
+
+      #card-tray {
+          display: flex;
+          overflow-x: auto;
+          max-width: 100%;
+      }
+
+      .tray-card {
+          width: 70px;
+          min-width: 70px;
+          height: 100px;
+          cursor: pointer;
+      }
+
+      .bottom-button {
+          width: 100%;
+          border: none;
+          padding: 10px;
+          margin-top: 10px;
+      }
+  </style>
 </head>
-
 <body>
-  <script src="js/main.js"></script>
+<div id="game-container">
+  <div id="card-area">
+    <svg class="dots" viewBox="0 0 25 150" xmlns="http://www.w3.org/2000/svg">
+      <circle r="8" cx="12.5" cy="37.5" fill="#f88"></circle>
+      <circle r="8" cx="12.5" cy="75" fill="#8f8"></circle>
+      <circle r="8" cx="12.5" cy="112.5" fill="#88f"></circle>
+    </svg>
+    <div id="center-cards">
+      <div class="card">
+      </div>
+      <svg class="card" viewBox="0 0 100 150" preserveAspectRatio="xMidyMid" xmlns="http://www.w3.org/2000/svg">
+        <rect width="100%" height="100%" fill="#f0f0f0" rx="5" ry="5"/>
+        <line x1="0" y1="37.5" x2="100" y2="37.5" stroke="#999" stroke-width="4"></line>
+        <line x1="0" y1="75" x2="100" y2="75" stroke="#999" stroke-width="4"></line>
+        <line x1="0" y1="112.5" x2="100" y2="112.5" stroke="#999" stroke-width="4"></line>
+      </svg>
+      <svg class="card" viewBox="0 0 100 150" preserveAspectRatio="xMidyMid" xmlns="http://www.w3.org/2000/svg">
+        <rect width="100%" height="100%" fill="#f0f0f0" rx="5" ry="5"/>
+        <line x1="0" y1="37.5" x2="100" y2="37.5" stroke="#999" stroke-width="4"></line>
+        <line x1="0" y1="75" x2="100" y2="75" stroke="#999" stroke-width="4"></line>
+        <line x1="0" y1="112.5" x2="100" y2="112.5" stroke="#999" stroke-width="4"></line>
+      </svg>
+    </div>
+    <svg class="dots" viewBox="0 0 25 150" xmlns="http://www.w3.org/2000/svg">
+      <circle r="8" cx="12.5" cy="37.5" fill="#f88"></circle>
+      <circle r="8" cx="12.5" cy="75" fill="#8f8"></circle>
+      <circle r="8" cx="12.5" cy="112.5" fill="#88f"></circle>
+    </svg>
+  </div>
+  <div id="card-tray">
+    <svg class="tray-card" viewBox="0 0 100 160" xmlns="http://www.w3.org/2000/svg">
+      <rect width="100%" height="160" fill="#f0f0f0" rx="5" ry="5"/>
+      <line x1="0" y1="40" x2="100" y2="40" stroke="#999" stroke-width="5"></line>
+      <line x1="0" y1="80" x2="100" y2="80" stroke="#999" stroke-width="5"></line>
+      <line x1="0" y1="120" x2="100" y2="120" stroke="#999" stroke-width="5"></line>
+    </svg>
+    <div draggable="true">
+      <svg class="tray-card" viewBox="0 0 100 160" xmlns="http://www.w3.org/2000/svg">
+        <rect width="100%" height="160" fill="#f0f0f0" rx="5" ry="5"/>
+        <polyline points="0,40 20,40 80,80 100,80" fill="none" stroke="#999" stroke-width="5"></polyline>
+        <polyline points="0,80 20,80 80,40 100,40" fill="none" stroke="#999" stroke-width="5"></polyline>
+        <polyline points="0,120 100,120" fill="none" stroke="#999" stroke-width="5"></polyline>
+        <circle r="7" cx="90" cy="40" fill="#999"></circle>
+      </svg>
+    </div>
+  </div>
+  <button id="hint" class="bottom-button">💡 Hint</button>
+</div>
 </body>
+<script type="application/javascript">
+    window.onload = function () {
+        const cardTrayDiv = document.getElementById("card-tray");
+        const centerCardsDiv = document.getElementById("center-cards");
+        const hintButton = document.getElementById("hint");
 
+        let cardTray = [];
+        let centerCards = [];
+        let solution = [];
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function permute(array, permutation) {
+            const copy = [...array]
+            for (let i = 0; i < permutation.length; i++) {
+                array[permutation[i]] = copy[i]
+            }
+        }
+
+        function randomBoolean() {
+            return Math.random() < 0.5;
+        }
+
+        function randomCard() {
+            return {
+                permutation: shuffle([0, 1, 2]),
+                ball: [randomBoolean(), randomBoolean(), randomBoolean()]
+            }
+        }
+
+        function getLineSvg(from, to, ball) {
+            const y1 = (from + 1) * 40;
+            const y2 = (to + 1) * 40;
+            const parts = [];
+            parts.push(`<polyline points="0,${y1} 20,${y1} 80,${y2} 100,${y2}" fill="none" stroke="#999" stroke-width="5"></polyline>`);
+            if (ball) {
+                parts.push(`<circle r="7" cx="90" cy="${y2}" fill="#999"></circle>`);
+            }
+            return parts.join("")
+        }
+
+        function getCenterCardSvg(index) {
+            const parts = []
+            const height = 150;
+            parts.push(`<svg class="card" viewBox="0 0 100 ${height}" preserveAspectRatio="xMidyMid" xmlns="http://www.w3.org/2000/svg">`)
+            parts.push(`<rect width="100%" height="100%" fill="#f0f0f0" rx="5" ry="5"/>`)
+            const card = centerCards[index]
+            if (card) {
+                let colors = [0, 1, 2];
+                for (let i = 0; i < index; ++i) {
+                    const card = centerCards[i];
+                    if (!card) {
+                        colors = [undefined, undefined, undefined];
+                        break;
+                    }
+                    permute(colors, card.permutation);
+                }
+
+                for (let i = 0; i < card.permutation.length; ++i) {
+                    const from = i;
+                    const to = card.permutation[i];
+                    const y1 = (from + 1) * height / 4;
+                    const y2 = (to + 1) * height / 4;
+                    const color = {
+                        0: "#f88",
+                        1: "#8f8",
+                        2: "#88f",
+                        undefined: "#999",
+                    }[colors[i]];
+                    parts.push(`<polyline points="0,${y1} 20,${y1} 80,${y2} 100,${y2}" fill="none" stroke="${color}" stroke-width="5"></polyline>`);
+                    if (card.ball[i]) {
+                        parts.push(`<circle r="7" cx="90" cy="${y2}" fill="${color}"></circle>`);
+                    }
+                }
+            }
+            parts.push(`</svg>`)
+            return parts.join("")
+        }
+
+        function getCardSvg(card) {
+            const parts = []
+            parts.push(`<svg class="tray-card" viewBox="0 0 100 160" xmlns="http://www.w3.org/2000/svg">`)
+            parts.push(`<rect width="100%" height="100%" fill="#f0f0f0" rx="5" ry="5"/>`)
+            for (let i = 0; i < card.permutation.length; ++i) {
+                parts.push(getLineSvg(i, card.permutation[i], card.ball[i]))
+            }
+            parts.push(`</svg>`)
+            return parts.join("")
+        }
+
+        function getBalls() {
+            const balls = [true, true, true];
+            for (let i = 0; i < centerCards.length; i++) {
+                const card = centerCards[i];
+                if (!card) {
+                    return [undefined, undefined, undefined];
+                }
+                for (let j = 0; j < card.ball.length; j++) {
+                    balls[j] ^= card.ball[j];
+                }
+                permute(balls, card.permutation);
+            }
+            return balls;
+        }
+
+        function isSolved() {
+            const permutation = [0, 1, 2];
+            const ball = [true, true, true];
+            for (let i = 0; i < centerCards.length; i++) {
+                const card = centerCards[i];
+                if (!card) {
+                    return false;
+                }
+                for (let bi = 0; bi < card.ball.length; bi++) {
+                    ball[bi] ^= card.ball[bi]
+                }
+                permute(ball, card.permutation);
+                permute(permutation, card.permutation);
+            }
+            for (let i = 0; i < permutation.length; i++) {
+                if (permutation[i] !== i) {
+                    return false;
+                }
+            }
+            for (const ball of getBalls()) {
+                if (!ball) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function draw() {
+            // Init tray
+            cardTrayDiv.innerHTML = "";
+            for (let i = 0; i < cardTray.length; i++) {
+                let card = cardTray[i];
+                const cardDiv = document.createElement('div');
+                cardDiv.onclick = function () {
+                    for (let j = 0; j < centerCards.length; j++) {
+                        if (!centerCards[j]) {
+                            centerCards[j] = card;
+                            draw();
+                            break;
+                        }
+                    }
+                };
+                cardDiv.draggable = true;
+                cardDiv.innerHTML = getCardSvg(card);
+                cardTrayDiv.appendChild(cardDiv);
+                card.div = cardDiv;
+            }
+
+            centerCardsDiv.innerHTML = "";
+            for (let i = 0; i < 3; i++) {
+                const cardDiv = document.createElement('div');
+                cardDiv.innerHTML = getCenterCardSvg(i);
+                cardDiv.onclick = function () {
+                    centerCards[i] = undefined;
+                    draw();
+                }
+                centerCardsDiv.appendChild(cardDiv);
+            }
+
+            if (isSolved()) {
+                hintButton.innerText = "🥳 Another!"
+                hintButton.onclick = init;
+            } else {
+                hintButton.innerText = "💡 Hint"
+                hintButton.onclick = function () {
+                    let hintIndex = undefined;
+                    for (let i = 0; i < centerCards.length; i++) {
+                        if (solution[i] !== centerCards[i]) {
+                            hintIndex = i;
+                            centerCards[i] = solution[i];
+                            break;
+                        }
+                    }
+                    for (let i = 0; i < centerCards.length; i++) {
+                        if (i === hintIndex) {
+                            continue;
+                        }
+                        if (centerCards[i] === solution[hintIndex]) {
+                            centerCards[i] = undefined;
+                        }
+                    }
+                    draw();
+                }
+            }
+        }
+
+        function init() {
+            let c0 = randomCard();
+            let c1 = randomCard();
+            solution = [
+                c0,
+                c1,
+            ];
+            let c2 = randomCard()
+            c2.permutation[c1.permutation[c0.permutation[0]]] = 0;
+            c2.permutation[c1.permutation[c0.permutation[1]]] = 1;
+            c2.permutation[c1.permutation[c0.permutation[2]]] = 2;
+            c2.ball[c1.permutation[c0.permutation[0]]] = c0.ball[0] ^ c1.ball[c0.permutation[0]];
+            c2.ball[c1.permutation[c0.permutation[1]]] = c0.ball[1] ^ c1.ball[c0.permutation[1]];
+            c2.ball[c1.permutation[c0.permutation[2]]] = c0.ball[2] ^ c1.ball[c0.permutation[2]];
+            solution.push(c2);
+            centerCards = solution.map(() => undefined);
+            cardTray = shuffle([...solution, randomCard(), randomCard()])
+            shuffle(cardTray)
+            draw();
+        }
+
+        init();
+    }
+</script>
 </html>
