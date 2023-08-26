@@ -143,19 +143,22 @@ window.onload = function () {
         for (let i = 0; i < cardTray.length; i++) {
             let card = cardTray[i];
             const cardDiv = document.createElement('div');
-            cardDiv.onclick = function () {
-                for (let j = 0; j < centerCards.length; j++) {
-                    if (!centerCards[j]) {
-                        centerCards[j] = card;
-                        draw();
-                        break;
-                    }
-                }
-            };
-            cardDiv.draggable = true;
             cardDiv.innerHTML = getCardSvg(card);
+            if (centerCards.some(c => c === card)) {
+                cardDiv.classList.add("disabled")
+            }
+            else {
+                cardDiv.onclick = function () {
+                    for (let j = 0; j < centerCards.length; j++) {
+                        if (!centerCards[j]) {
+                            centerCards[j] = card;
+                            draw();
+                            break;
+                        }
+                    }
+                };
+            }
             cardTrayDiv.appendChild(cardDiv);
-            card.div = cardDiv;
         }
 
         centerCardsDiv.innerHTML = "";
@@ -256,5 +259,4 @@ window.onload = function () {
     }
 
     init();
-    console.log("Initialized")
 }
