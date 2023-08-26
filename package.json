@@ -1,0 +1,22 @@
+{
+  "name": "symmetric-shuffle",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/simonolander/symmetric-shuffle.git"
+  },
+  "author": "",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/simonolander/symmetric-shuffle/issues"
+  },
+  "homepage": "https://github.com/simonolander/symmetric-shuffle#readme",
+  "devDependencies": {
+    "parcel": "^2.9.3"
+  }
+}
