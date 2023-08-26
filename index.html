@@ -31,6 +31,8 @@
           align-items: center;
           justify-content: space-around;
           flex-grow: 1;
+          padding-left: 5px;
+          padding-right: 5px;
       }
 
       #center-cards {
@@ -40,19 +42,23 @@
           flex-grow: 1;
       }
 
+      .center-card-container {
+          margin: 0;
+          box-sizing: border-box;
+      }
+
       .dots {
           width: 25px;
           height: 150px;
-          margin: 5px;
       }
 
       .card {
           width: 100px;
           height: 150px;
-          margin: 5px;
           cursor: pointer;
-          border: 1px solid #aaa;
           border-radius: 10px;
+          margin-left: 5px;
+          margin-right: 5px;
       }
 
       #card-tray {
@@ -79,32 +85,22 @@
 <body>
 <div id="game-container">
   <div id="card-area">
-    <svg class="dots" viewBox="0 0 25 150" xmlns="http://www.w3.org/2000/svg">
-      <circle r="8" cx="12.5" cy="37.5" fill="#f88"></circle>
-      <circle r="8" cx="12.5" cy="75" fill="#8f8"></circle>
-      <circle r="8" cx="12.5" cy="112.5" fill="#88f"></circle>
-    </svg>
-    <div id="center-cards">
-      <div class="card">
-      </div>
-      <svg class="card" viewBox="0 0 100 150" preserveAspectRatio="xMidyMid" xmlns="http://www.w3.org/2000/svg">
-        <rect width="100%" height="100%" fill="#f0f0f0" rx="5" ry="5"/>
-        <line x1="0" y1="37.5" x2="100" y2="37.5" stroke="#999" stroke-width="4"></line>
-        <line x1="0" y1="75" x2="100" y2="75" stroke="#999" stroke-width="4"></line>
-        <line x1="0" y1="112.5" x2="100" y2="112.5" stroke="#999" stroke-width="4"></line>
-      </svg>
-      <svg class="card" viewBox="0 0 100 150" preserveAspectRatio="xMidyMid" xmlns="http://www.w3.org/2000/svg">
-        <rect width="100%" height="100%" fill="#f0f0f0" rx="5" ry="5"/>
-        <line x1="0" y1="37.5" x2="100" y2="37.5" stroke="#999" stroke-width="4"></line>
-        <line x1="0" y1="75" x2="100" y2="75" stroke="#999" stroke-width="4"></line>
-        <line x1="0" y1="112.5" x2="100" y2="112.5" stroke="#999" stroke-width="4"></line>
+    <div id="left-dots">
+      <svg class="dots" viewBox="0 0 25 150" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+        <circle r="8" cx="12.5" cy="37.5" fill="#f88"></circle>
+        <circle r="8" cx="12.5" cy="75" fill="#8f8"></circle>
+        <circle r="8" cx="12.5" cy="112.5" fill="#88f"></circle>
       </svg>
     </div>
-    <svg class="dots" viewBox="0 0 25 150" xmlns="http://www.w3.org/2000/svg">
-      <circle r="8" cx="12.5" cy="37.5" fill="#f88"></circle>
-      <circle r="8" cx="12.5" cy="75" fill="#8f8"></circle>
-      <circle r="8" cx="12.5" cy="112.5" fill="#88f"></circle>
-    </svg>
+    <div id="center-cards">
+    </div>
+    <div id="right-dots">
+      <svg class="dots" viewBox="0 0 25 150" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+        <circle r="8" cx="12.5" cy="37.5" fill="#f88"></circle>
+        <circle r="8" cx="12.5" cy="75" fill="#8f8"></circle>
+        <circle r="8" cx="12.5" cy="112.5" fill="#88f" stroke="#a44" stroke-width="3px"></circle>
+      </svg>
+    </div>
   </div>
   <div id="card-tray">
     <svg class="tray-card" viewBox="0 0 100 160" xmlns="http://www.w3.org/2000/svg">
@@ -131,6 +127,8 @@
         const cardTrayDiv = document.getElementById("card-tray");
         const centerCardsDiv = document.getElementById("center-cards");
         const hintButton = document.getElementById("hint");
+        const leftDotsContainer = document.getElementById("left-dots");
+        const rightDotsContainer = document.getElementById("right-dots");
 
         let cardTray = [];
         let centerCards = [];
@@ -176,7 +174,7 @@
         function getCenterCardSvg(index) {
             const parts = []
             const height = 150;
-            parts.push(`<svg class="card" viewBox="0 0 100 ${height}" preserveAspectRatio="xMidyMid" xmlns="http://www.w3.org/2000/svg">`)
+            parts.push(`<svg class="card" viewBox="0 0 100 ${height}" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">`)
             parts.push(`<rect width="100%" height="100%" fill="#f0f0f0" rx="5" ry="5"/>`)
             const card = centerCards[index]
             if (card) {
@@ -287,13 +285,39 @@
 
             centerCardsDiv.innerHTML = "";
             for (let i = 0; i < 3; i++) {
-                const cardDiv = document.createElement('div');
-                cardDiv.innerHTML = getCenterCardSvg(i);
-                cardDiv.onclick = function () {
+                const centerCardContainerDiv = document.createElement('div');
+                centerCardContainerDiv.classList.add("center-card-container")
+                centerCardContainerDiv.innerHTML = getCenterCardSvg(i);
+                centerCardContainerDiv.onclick = function () {
                     centerCards[i] = undefined;
                     draw();
                 }
-                centerCardsDiv.appendChild(cardDiv);
+                centerCardsDiv.appendChild(centerCardContainerDiv);
+            }
+
+            const balls = getBalls();
+            console.log(balls)
+            {
+                const parts = []
+                const height = 150;
+                parts.push(`<svg class="dots" viewBox="0 0 25 ${height}" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">`)
+                for (let i = 0; i < balls.length; i++) {
+                    const color = {
+                        0: "#f88",
+                        1: "#8f8",
+                        2: "#88f",
+                    }[i];
+                    const cy = (i + 1) * height / 4;
+                    const strokeWidth = {
+                        0: "3px",
+                        1: "0px",
+                        undefined: "0px",
+                    }[balls[i]]
+                    parts.push(`<circle r="8" cx="12.5" cy="${cy}" fill="${color}" stroke="#666" stroke-width="${strokeWidth}"></circle>`)
+                }
+                parts.push(`</svg>`)
+                leftDotsContainer.innerHTML = parts.join("");
+                rightDotsContainer.innerHTML = leftDotsContainer.innerHTML;
             }
 
             if (isSolved()) {
